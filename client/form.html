@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="form.css" />
+    <title>Document</title>
+    <script src="form.js"></script>
+  </head>
+  <script>
+    window.onload = f3();
+  </script>
+
+  <script>
+    t1 = null;
+    t2 = null;
+
+    function show() {
+      t1 = setTimeout(f1, 1000);
+      t2 = setInterval(f2, 1000);
+      let sec = f2();
+    }
+
+    function f3() {
+      setTimeout(f1, 2000);
+      setInterval(f2, 1000);
+    }
+
+    function f1() {
+      var d = document.getElementById("secretdiv");
+      d.style.display = "block";
+    }
+    min = 0;
+    sec = 0;
+
+    // function f2() {
+
+    // sec++;
+    //  msg =   sec
+    //  var d = document.getElementById("secretdiv")
+    //  d.innerHTML = msg;
+    // return sec;
+    // }
+
+    function f2() {
+      sec++;
+      if (sec == 60) {
+        sec = 0;
+        min += 1;
+      }
+
+      msg = min + ":" + sec;
+      var d = document.getElementById("secretdiv");
+      d.innerHTML = msg;
+      return sec;
+    }
+
+    function stop() {
+      window.location.reload();
+    }
+  </script>
+
+  <script>
+    function validate() {
+      var regName = /^[a-zA-Z]+$/;
+
+      var name = document.getElementById("username").value;
+      if (!regName.test(name)) {
+        // alert('please enter your correct name.');
+        document.getElementById("username").focus();
+        return false;
+      }
+      return true;
+    }
+    function agevalid() {
+      var age = document.getElementById("age").value;
+      if (isNaN(age) || age < 1 || age > 100) {
+        // alert("Please enter your age");
+        return false;
+      }
+      return true;
+    }
+
+    function textvalid() {
+      var t = document.getElementById("ans").value.length;
+
+      if (t > 0) return true;
+    }
+
+    function select_gender() {
+      var g = document.getElementById("gen").value;
+      if (g == "") {
+        return false;
+      }
+      return true;
+    }
+
+    function select_user() {
+      var u = document.getElementById("user").value;
+      if (u == "") {
+        return false;
+      }
+      return true;
+    }
+  </script>
+
+  <script>
+    let timein, hours, minute, second;
+    function timeIn() {
+      timein = new Date().getTime();
+      let d = new Date(timein);
+      second = d.getSeconds();
+      minute = d.getMinutes();
+      hours = d.getHours();
+      hours = hours.toString().padStart(2, "0");
+      minute = minute.toString().padStart(2, "0");
+      second = second.toString().padStart(2, "0");
+    }
+    let seconds;
+
+    function timeOut() {
+      let s = new Date().getTime();
+      let difference = s - timein;
+      // console.log(difference);
+      seconds = difference / 1000;
+      // let min=sec/60;
+      // let hrs=min/60;
+      //   hrs=hrs%24;
+      //   min=min%60;
+      seconds = seconds % 60;
+      //   hrs=hrs.toFixed(0);
+      // min=min.toFixed(0);
+      seconds = seconds.toFixed(0);
+      return seconds;
+    }
+  </script>
+
+  <script>
+    async function api() {
+      var fname = document.getElementById("username").value;
+      var age = document.getElementById("age").value;
+      var gender = document.getElementById("gen").value;
+      var answer = document.getElementById("ans").value.length;
+      var user = document.getElementById("user").value;
+      let result;
+      let f = f2();
+      try {
+        result = await fetch("http://127.0.0.1:5000/post", {
+          method: "POST",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: fname,
+            age: age,
+            gender: gender,
+            answer: answer,
+            user: user,
+            time: f,
+          }),
+        });
+
+        return result.json();
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    async function takevalue() {
+      let i = 0;
+      i++;
+      let name = validate();
+      let age = agevalid();
+      let textar = textvalid();
+      let selG = select_gender();
+      let selU = select_user();
+      let seconds = timeOut();
+      let f = f2();
+
+      var optionSelected = document.getElementById("user");
+      var optionSelected_value =
+        optionSelected.options[optionSelected.selectedIndex].value;
+      yash = name && age && textar && selG && selU && f;
+      if (yash && optionSelected_value == "predicted") {
+        let result = await api();
+        alert(
+          `predicted time is ${result}sec  and  Actual Time is ${f + 1}sec`
+        );
+      }
+      if (yash && optionSelected_value == "new") {
+        let result = await api();
+      }
+
+      if (!name) {
+        alert("please enter your name");
+      }
+      if (!age) {
+        alert("please enter your coreect age");
+      }
+      if (!textar) {
+        alert("please enter answer");
+      }
+      if (!selG) {
+        alert("please select gender");
+      }
+      if (!selU) {
+        alert("please select user type");
+      }
+      // if(name && age && textar && selG && selU && optionSelected_value=='predicted')
+      // {
+      //   alert(` Actual Time is ${f+1}sec`);
+      // }
+      stop();
+    }
+  </script>
+
+  <!-- <script>
+    $('#submit').removeAttr('disabled');
+    function enablesecondbutton() {
+      document.getElementById("button1").disabled = true;
+      document.getElementById("button2").disabled = false;
+      document.getElementById("username").disabled = false;
+      document.getElementById("age").disabled = false;
+      document.getElementById("ans").disabled = false;
+  }
+  </script> -->
+  <body>
+    <br />
+    <div id="secretdiv"></div>
+
+    <!-- <input type="button" onclick="timeIn()" value="WRITE  YOUR  ANSWER" id="button1"></b><br><br> -->
+    <br />
+    <center>
+      <form name="RegForm">
+        <table
+          border="4"
+          cellspacing="6"
+          cellpadding="20px"
+          aria-required="true"
+        >
+          <tr>
+            <td><label for="n1">Name</label></td>
+            <td>
+              <input
+                type="text"
+                name="n1"
+                id="username"
+                placeholder="name"
+                class="form-control"
+                size="30"
+                required
+                type="text"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td><label for="n2">Age</label></td>
+            <td>
+              <input type="number" name="n2" id="age" placeholder="age" />
+            </td>
+          </tr>
+
+          <tr>
+            <td><label for="n8">Gender</label></td>
+            <td>
+              <select id="gen">
+                <option value=""></option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </td>
+          </tr>
+
+          <tr>
+            <td><label>What are the Machine Learning problems?</label></td>
+            <td>
+              <textarea
+                name="n3"
+                id="ans"
+                cols="30"
+                rows="10"
+                placeholder="Answer here"
+                required
+              ></textarea>
+            </td>
+          </tr>
+          <tr>
+            <td><label>User</label></td>
+            <td>
+              <select id="user">
+                <option value=""></option>
+                <option value="predicted">Predicted</option>
+                <option value="new">New</option>
+              </select>
+            </td>
+          </tr>
+        </table>
+      </form>
+    </center>
+    <br /><br />
+    <button
+      type="submit"
+      value="SUBMIT"
+      onclick="validate(),takevalue()"
+      id="button2"
+    >
+      SUBMIT
+    </button>
+  </body>
+</html>
